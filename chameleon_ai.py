@@ -137,8 +137,15 @@ class ChameleonEngine:
 engine = ChameleonEngine()
 
 # ─── aiohttp Middleware Hook ───────────────────────────────────────────────
+from aiohttp import web
+
+@web.middleware
 async def chameleon_middleware(request, handler):
-    domain = request.host or "unknown"
+    # aiohttp 3.x: request.host is property, but middleware may receive Application in tests
+    try:
+        domain = request.host or "unknown"
+    except AttributeError:
+        domain = request.headers.get("Host", "unknown") if hasattr(request, "headers") else "unknown"
     profile = engine.get_profile(domain)
     # Inject delay jitter
     await asyncio.sleep(profile.delay_ms / 1000.0 * random.uniform(0.5, 1.5))

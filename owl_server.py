@@ -78,10 +78,16 @@ class OwlServer:
         self.host = host
         self.api_port = api_port
         self.metrics_port = metrics_port
+        # P0-10 3-port binds — expose via env ORCA_ROUTER_PORT / KIRO_GATEWAY_PORT
+        self.orca_port = int(os.getenv("ORCA_ROUTER_PORT", "60001"))
+        self.kiro_port = int(os.getenv("KIRO_GATEWAY_PORT", "8333"))
+        self.enable_3port = _env_bool("OWL_ENABLE_3PORT", False)
         self.client_kwargs = client_kwargs
         self.client: Optional[ResilientClient] = None
         self._api_runner: Optional[web.AppRunner] = None
         self._metrics_site: Optional[asyncio.AbstractServer] = None
+        self._orca_runner: Optional[web.AppRunner] = None
+        self._kiro_runner: Optional[web.AppRunner] = None
 
     async def start(self):
         """Start the API server and metrics endpoint."""
@@ -112,6 +118,22 @@ class OwlServer:
         await site.start()
         logger.info(f"🦉 OWL-AGENT API listening on http://{self.host}:{self.api_port}")
 
+        # P0-10 3-port binds — Orca Router 60001 + Kiro Gateway 8333 (opt-in via OWL_ENABLE_3PORT=1)
+        if self.enable_3port:
+            for port, label, attr in [(self.orca_port, "Orca Router", "_orca_runner"), (self.kiro_port, "Kiro Gateway", "_kiro_runner")]:
+                sub_app = web.Application(middlewares=middlewares if CHAMELEON_AVAILABLE else [])
+                sub_app.router.add_get("/health", self.handle_health)
+                sub_app.router.add_get("/stats", self.handle_stats)
+                sub_app.router.add_get("/v1/models", self.handle_orca_models)
+                sub_app.router.add_post("/v1/chat/completions", self.handle_orca_chat)
+                sub_app.router.add_get("/chameleon/stats", self.handle_chameleon_stats)
+                runner = web.AppRunner(sub_app)
+                await runner.setup()
+                sub_site = web.TCPSite(runner, self.host, port)
+                await sub_site.start()
+                setattr(self, attr, runner)
+                logger.info(f"🔀 {label} listening on http://{self.host}:{port}")
+
         # Metrics server (port 9090)
         metrics_app = web.Application()
         metrics_app.router.add_get("/metrics", self.handle_metrics)
@@ -124,12 +146,29 @@ class OwlServer:
         # Background proxy pool metrics updater
         asyncio.create_task(self._update_metrics_loop())
 
+    async def handle_orca_models(self, request: web.Request) -> web.Response:
+        """GET /v1/models — Orca Router compatibility (freebuff2api translator)."""
+        return web.json_response({"object": "list", "data": [{"id": "owl-auto-racer", "object": "model", "owned_by": "owl"}, {"id": "gpt-4o", "object": "model"}, {"id": "claude-3.5-sonnet", "object": "model"}]})
+
+    async def handle_orca_chat(self, request: web.Request) -> web.Response:
+        """POST /v1/chat/completions — minimal OpenAI-compatible proxy (stream racing placeholder)."""
+        try:
+            body = await request.json()
+        except Exception:
+            body = {}
+        # Echo stub — real implementation races Copilot/Antigravity via SmartChannelRouter
+        return web.json_response({"id": "chatcmpl-owl", "object": "chat.completion", "choices": [{"message": {"role": "assistant", "content": f"[OWL stub] {body.get('messages', [])[-1].get('content','') if body.get('messages') else 'ok'}"}, "finish_reason": "stop"}]})
+
     async def stop(self):
         """Graceful shutdown."""
         if self._api_runner:
             await self._api_runner.cleanup()
         if self._metrics_runner:
             await self._metrics_runner.cleanup()
+        if self._orca_runner:
+            await self._orca_runner.cleanup()
+        if self._kiro_runner:
+            await self._kiro_runner.cleanup()
         if self.client:
             await self.client.__aexit__(None, None, None)
 

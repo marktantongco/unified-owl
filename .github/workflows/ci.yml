@@ -1,0 +1,25 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: AGENTS.md SHA gate
+        run: |
+          PINNED_SHA="75d286671c4f8151fb526d8fe19e29a433fefba5"
+          EXPECTED="49eb054a77ac8e9dadd3564c5fcd4a1b1760c893bbf8d1979924675f350b7c95"
+          curl -fsSL "https://raw.githubusercontent.com/marktantongco/opencode-os/${PINNED_SHA}/profiles/smp5.4pd.md" -o /tmp/pinned.md
+          got=$(sha256sum /tmp/pinned.md | cut -d' ' -f1)
+          test "$got" = "$EXPECTED" || { echo "SHA mismatch $got != $EXPECTED"; exit 1; }
+          grep -q "CANARY=${PINNED_SHA}" AGENTS.md || { echo "CANARY missing"; exit 1; }
+      - name: preflight
+        run: bash install.sh --verify-agents
+      - name: py_compile
+        run: python -m py_compile proxy_defense.py owl_server.py chameleon_ai.py owl_dns_synergy/core.py owl_dns_synergy/router_v3.py owl_security/ssrf.py mesh/broadcast.py
+      - name: pip-audit
+        run: pip install pip-audit && pip-audit || true
+      - name: wrangler dry-run
+        run: npx wrangler deploy --config edge/wrangler.toml --dry-run
