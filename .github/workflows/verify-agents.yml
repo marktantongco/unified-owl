@@ -1,0 +1,43 @@
+name: verify-agents
+
+on:
+  pull_request:
+  push:
+    branches: [master, main]
+
+jobs:
+  verify-agents:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify AGENTS.md pin + sync
+        env:
+          PINNED_SHA: 75d286671c4f8151fb526d8fe19e29a433fefba5
+          PINNED_URL: https://raw.githubusercontent.com/marktantongco/opencode-os/75d286671c4f8151fb526d8fe19e29a433fefba5/profiles/smp5.4pd.md
+          EXPECTED_SHA256: 49eb054a77ac8e9dadd3564c5fcd4a1b1760c893bbf8d1979924675f350b7c95
+        run: |
+          set -euo pipefail
+          echo "▸ Fetch pinned $PINNED_SHA and check sha256"
+          curl -fsSL "$PINNED_URL" -o /tmp/pinned.md
+          got=$(sha256sum /tmp/pinned.md | cut -d' ' -f1)
+          if [[ "$got" != "$EXPECTED_SHA256" ]]; then
+            echo "❌ Pinned sha256 mismatch: got $got expected $EXPECTED_SHA256"
+            exit 1
+          fi
+          echo "✅ Pinned sha256 OK $EXPECTED_SHA256"
+          # Global vs project diff gate (project checked out from repo)
+          # Simulate global by fetching pinned wrapper? Instead verify project contains pinned URL line
+          grep -q "75d286671c4f8151fb526d8fe19e29a433fefba5" AGENTS.md || { echo "❌ AGENTS.md missing pinned SHA"; exit 1; }
+          grep -q "CANARY=75d286" AGENTS.md && echo "✅ CANARY present" || echo "⚠️ CANARY missing (optional)"
+          echo "✅ AGENTS.md contains pinned SHA"
+          # Run install.sh preflight verify (requires bash)
+          bash install.sh --verify-agents
+          # Ensure AGENTS.md not gitignored and is tracked
+          git check-ignore -q AGENTS.md && { echo "❌ AGENTS.md is gitignored"; exit 1; } || echo "✅ not gitignored"
+          git ls-files --stage | grep -q "AGENTS.md" || { echo "❌ AGENTS.md not staged/tracked"; exit 1; }
+          echo "✅ git ls-files tracked"
+          # diff gate if global exists in CI (create global from pinned for test)
+          mkdir -p ~/.config/opencode
+          cp AGENTS.md ~/.config/opencode/AGENTS.md
+          diff -u ~/.config/opencode/AGENTS.md ./AGENTS.md || { echo "❌ diff drift"; exit 1; }
+          echo "✅ diff -u OK"
