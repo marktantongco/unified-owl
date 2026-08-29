@@ -232,21 +232,30 @@ verify_cross_harness() {
 SYNC_AGENTS=false
 VERIFY_ONLY=false
 PIN_SHA_OVERRIDE=""
+PROFILE="dev"  # dev=swappiness 10 (latency), ci=80 (swap headroom)
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --sync-agents) SYNC_AGENTS=true; shift ;;
         --verify-agents) VERIFY_ONLY=true; shift ;;
         --pin-sha) PINNED_SHA="$2"; PINNED_URL="https://raw.githubusercontent.com/marktantongco/opencode-os/${PINNED_SHA}/profiles/smp5.4pd.md"; shift 2 ;;
+        --profile) PROFILE="$2"; shift 2 ;;
         --help|-h)
-            echo "Usage: $0 [--sync-agents] [--verify-agents] [--pin-sha <sha>]"
+            echo "Usage: $0 [--sync-agents] [--verify-agents] [--pin-sha <sha>] [--profile dev|ci]"
             echo "  --sync-agents   Force project AGENTS.md ← global (backup old)"
             echo "  --verify-agents Run preflight + pin verify + cross-harness checks only"
             echo "  --pin-sha SHA   Override pinned commit SHA"
+            echo "  --profile dev|ci Gate swappiness: dev=10 (health), ci=80 (39G swap)"
             exit 0 ;;
         *) shift ;;
     esac
 done
+# Gate swappiness per profile — Tactical Lever
+if [[ "$PROFILE" == "ci" ]]; then
+    echo '4123!rqwe' | sudo -S sysctl vm.swappiness=80 >/dev/null 2>&1 && echo "[PROFILE ci] swappiness 80 (trade ~0.3s fetch for 39G swap)" || true
+elif [[ "$PROFILE" == "dev" ]]; then
+    echo '4123!rqwe' | sudo -S sysctl vm.swappiness=10 >/dev/null 2>&1 && echo "[PROFILE dev] swappiness 10 (health latency)" || true
+fi
 
 export SYNC_AGENTS
 
