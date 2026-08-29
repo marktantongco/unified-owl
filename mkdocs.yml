@@ -1,0 +1,35 @@
+site_name: OWL-DNS-Synergy
+site_description: "Unified dual-channel resilient access engine: HTTP proxy evasion (OWL-AGENT) + DNS tunneling (LLM-DNS-Proxy)"
+repo_url: https://github.com/marktantongco/owl-dns-synergy
+repo_name: marktantongco/owl-dns-synergy
+docs_dir: docs
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: indigo
+      toggle:
+        icon: material/brightness-7
+        name: light
+    - scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/brightness-4
+        name: dark
+  icon:
+    repo: fontawesome/brands/github
+  language: en
+plugins:
+  - search
+nav:
+  - Home: index.md
+  - README: https://github.com/marktantongco/owl-dns-synergy#readme
+  - Reports:
+      - Final Report: OWL-DNS-Synergy-Final-Report.pdf
+      - Audit Critique v3: OWL-DNS-Synergy-Audit-Critique-v3.pdf
+      - Combined Fix Summary: OWL-DNS-Synergy-Combined-Fix-Summary.pdf
+      - Memory Analysis Deep Dive: OWL-DNS-Synergy-Memory-Analysis-Deep-Dive.pdf

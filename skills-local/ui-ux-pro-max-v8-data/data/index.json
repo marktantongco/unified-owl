@@ -1,0 +1,488 @@
+{
+  "version": "8.0.0",
+  "description": "UI/UX PRO MAX v8.0 — Data Lookup Engine Index. Contains all Module 7 data tables in searchable CSV/JSON format for programmatic lookup.",
+  "generated": "2025-01-01",
+  "files": [
+    {
+      "path": "data/colors.csv",
+      "domain": "color",
+      "recordCount": 96,
+      "description": "Color palettes for 96 product types/industries. Each row provides Primary, Secondary, CTA, Background, Text, and Border hex colors with usage notes.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Product Type", "type": "string", "description": "Industry or product category name"},
+        {"column": "Primary (Hex)", "type": "string", "description": "Primary brand color hex code"},
+        {"column": "Secondary (Hex)", "type": "string", "description": "Secondary brand color hex code"},
+        {"column": "CTA (Hex)", "type": "string", "description": "Call-to-action button color hex code"},
+        {"column": "Background (Hex)", "type": "string", "description": "Background color hex code"},
+        {"column": "Text (Hex)", "type": "string", "description": "Text color hex code"},
+        {"column": "Border (Hex)", "type": "string", "description": "Border color hex code"},
+        {"column": "Notes", "type": "string", "description": "Design rationale and usage notes"}
+      ]
+    },
+    {
+      "path": "data/styles.csv",
+      "domain": "style",
+      "recordCount": 67,
+      "description": "UI style specifications for 67 design styles (Minimalism, Glassmorphism, Brutalism, etc.). Includes color guidance, effects, accessibility, framework compatibility, and CSS variables.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Style Category", "type": "string", "description": "Name of the design style"},
+        {"column": "Type", "type": "string", "description": "General, Landing Page, or BI/Analytics"},
+        {"column": "Keywords", "type": "string", "description": "Comma-separated search keywords"},
+        {"column": "Primary Colors", "type": "string", "description": "Primary color palette description"},
+        {"column": "Secondary Colors", "type": "string", "description": "Secondary color palette description"},
+        {"column": "Effects & Animation", "type": "string", "description": "Animation and effect specifications"},
+        {"column": "Best For", "type": "string", "description": "Recommended use cases"},
+        {"column": "Do Not Use For", "type": "string", "description": "Inappropriate use cases"},
+        {"column": "Light Mode", "type": "string", "description": "Light mode compatibility rating"},
+        {"column": "Dark Mode", "type": "string", "description": "Dark mode compatibility rating"},
+        {"column": "Performance", "type": "string", "description": "Performance impact rating"},
+        {"column": "Accessibility", "type": "string", "description": "Accessibility compliance level"},
+        {"column": "Mobile-Friendly", "type": "string", "description": "Mobile compatibility rating"},
+        {"column": "Conversion-Focused", "type": "string", "description": "Conversion optimization rating"},
+        {"column": "Framework Compatibility", "type": "string", "description": "Framework-specific ratings"},
+        {"column": "Era/Origin", "type": "string", "description": "Historical origin of the style"},
+        {"column": "Complexity", "type": "string", "description": "Implementation complexity (Low/Medium/High)"},
+        {"column": "AI Prompt Keywords", "type": "string", "description": "Keywords for AI prompt generation"},
+        {"column": "CSS/Technical Keywords", "type": "string", "description": "Technical CSS property specifications"},
+        {"column": "Implementation Checklist", "type": "string", "description": "Checklist items for implementation"},
+        {"column": "Design System Variables", "type": "string", "description": "CSS custom property definitions"}
+      ]
+    },
+    {
+      "path": "data/typography.csv",
+      "domain": "typography",
+      "recordCount": 56,
+      "description": "Font pairing recommendations for 56 categories/moods. Includes heading and body font, mood keywords, Google Fonts URLs, CSS imports, and Tailwind configs.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Font Pairing Name", "type": "string", "description": "Name of the font pairing"},
+        {"column": "Category", "type": "string", "description": "Font category (Serif+Sans, Sans+Sans, etc.)"},
+        {"column": "Heading Font", "type": "string", "description": "Font for headings"},
+        {"column": "Body Font", "type": "string", "description": "Font for body text"},
+        {"column": "Mood/Style Keywords", "type": "string", "description": "Mood descriptors"},
+        {"column": "Best For", "type": "string", "description": "Recommended use cases"},
+        {"column": "Google Fonts URL", "type": "string", "description": "Google Fonts sharing URL"},
+        {"column": "CSS Import", "type": "string", "description": "CSS @import statement"},
+        {"column": "Tailwind Config", "type": "string", "description": "Tailwind CSS fontFamily configuration"},
+        {"column": "Notes", "type": "string", "description": "Usage notes and alternatives"}
+      ]
+    },
+    {
+      "path": "data/ux-guidelines.csv",
+      "domain": "ux",
+      "recordCount": 98,
+      "description": "UX do/don't guidelines covering Navigation, Animation, Layout, Touch, Interaction, Accessibility, Performance, Forms, Responsive, Typography, Feedback, Content, Onboarding, Search, Data Entry, AI Interaction, Spatial UI, and Sustainability.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Category", "type": "string", "description": "UX category (Navigation, Animation, etc.)"},
+        {"column": "Issue", "type": "string", "description": "Specific UX issue name"},
+        {"column": "Platform", "type": "string", "description": "Target platform (Web, Mobile, All, VisionOS)"},
+        {"column": "Description", "type": "string", "description": "Issue description"},
+        {"column": "Do", "type": "string", "description": "Best practice recommendation"},
+        {"column": "Don't", "type": "string", "description": "What to avoid"},
+        {"column": "Code Example Good", "type": "string", "description": "Good code example"},
+        {"column": "Code Example Bad", "type": "string", "description": "Bad code example"},
+        {"column": "Severity", "type": "string", "description": "Severity level (High/Medium/Low)"}
+      ]
+    },
+    {
+      "path": "data/charts.csv",
+      "domain": "chart",
+      "recordCount": 25,
+      "description": "Chart type recommendations for 25 data visualization scenarios. Includes best chart type, secondary options, color guidance, accessibility notes, and library recommendations.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Data Type", "type": "string", "description": "Type of data to visualize"},
+        {"column": "Keywords", "type": "string", "description": "Search keywords"},
+        {"column": "Best Chart Type", "type": "string", "description": "Primary recommended chart type"},
+        {"column": "Secondary Options", "type": "string", "description": "Alternative chart types"},
+        {"column": "Color Guidance", "type": "string", "description": "Color scheme recommendations"},
+        {"column": "Performance Impact", "type": "string", "description": "Rendering performance rating"},
+        {"column": "Accessibility Notes", "type": "string", "description": "Accessibility considerations"},
+        {"column": "Library Recommendation", "type": "string", "description": "Recommended JavaScript libraries"},
+        {"column": "Interactive Level", "type": "string", "description": "Recommended interactivity features"}
+      ]
+    },
+    {
+      "path": "data/icons.csv",
+      "domain": "icon",
+      "recordCount": 100,
+      "description": "Icon recommendations for 100 common UI actions/categories. Maps icon names to Lucide React import codes and usage contexts.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Category", "type": "string", "description": "Icon category (Navigation, Action, Status, etc.)"},
+        {"column": "Icon Name", "type": "string", "description": "Lucide icon name"},
+        {"column": "Keywords", "type": "string", "description": "Search keywords"},
+        {"column": "Library", "type": "string", "description": "Icon library (Lucide)"},
+        {"column": "Import Code", "type": "string", "description": "React import statement"},
+        {"column": "Usage", "type": "string", "description": "JSX usage example"},
+        {"column": "Best For", "type": "string", "description": "Recommended use cases"},
+        {"column": "Style", "type": "string", "description": "Icon style (Outline)"}
+      ]
+    },
+    {
+      "path": "data/ui-reasoning.csv",
+      "domain": "reasoning",
+      "recordCount": 100,
+      "description": "UI reasoning engine mapping 100 product types to recommended UI patterns, style priorities, color moods, typography moods, key effects, decision rules, and anti-patterns.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "UI_Category", "type": "string", "description": "Product type or industry category"},
+        {"column": "Recommended_Pattern", "type": "string", "description": "Recommended landing page pattern"},
+        {"column": "Style_Priority", "type": "string", "description": "Primary and secondary style recommendations"},
+        {"column": "Color_Mood", "type": "string", "description": "Color palette mood description"},
+        {"column": "Typography_Mood", "type": "string", "description": "Typography style recommendation"},
+        {"column": "Key_Effects", "type": "string", "description": "Key animation/effect specifications"},
+        {"column": "Decision_Rules", "type": "string", "description": "JSON conditional decision rules"},
+        {"column": "Anti_Patterns", "type": "string", "description": "What to avoid"},
+        {"column": "Severity", "type": "string", "description": "Priority level (HIGH/MEDIUM)"}
+      ]
+    },
+    {
+      "path": "data/web-interface.csv",
+      "domain": "web",
+      "recordCount": 30,
+      "description": "Web interface do/don't guidelines covering Accessibility, Focus, Forms, Performance, State, Typography, and Anti-Patterns for React/Next.js projects.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Category", "type": "string", "description": "Guideline category"},
+        {"column": "Issue", "type": "string", "description": "Specific issue name"},
+        {"column": "Keywords", "type": "string", "description": "Search keywords"},
+        {"column": "Platform", "type": "string", "description": "Target platform"},
+        {"column": "Description", "type": "string", "description": "Issue description"},
+        {"column": "Do", "type": "string", "description": "Best practice"},
+        {"column": "Don't", "type": "string", "description": "What to avoid"},
+        {"column": "Code Example Good", "type": "string", "description": "Good code example"},
+        {"column": "Code Example Bad", "type": "string", "description": "Bad code example"},
+        {"column": "Severity", "type": "string", "description": "Severity level"}
+      ]
+    },
+    {
+      "path": "data/react-performance.csv",
+      "domain": "performance",
+      "recordCount": 44,
+      "description": "React/Next.js performance optimization patterns covering Async Waterfall, Bundle Size, Server, Client, Rerender, Rendering, JS Perf, and Advanced categories.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Category", "type": "string", "description": "Optimization category"},
+        {"column": "Issue", "type": "string", "description": "Specific optimization name"},
+        {"column": "Keywords", "type": "string", "description": "Search keywords"},
+        {"column": "Platform", "type": "string", "description": "Target platform (React/Next.js)"},
+        {"column": "Description", "type": "string", "description": "Optimization description"},
+        {"column": "Do", "type": "string", "description": "Best practice"},
+        {"column": "Don't", "type": "string", "description": "What to avoid"},
+        {"column": "Code Example Good", "type": "string", "description": "Good code example"},
+        {"column": "Code Example Bad", "type": "string", "description": "Bad code example"},
+        {"column": "Severity", "type": "string", "description": "Severity level"}
+      ]
+    },
+    {
+      "path": "data/landing.csv",
+      "domain": "landing",
+      "recordCount": 30,
+      "description": "Landing page pattern specifications for 30 conversion-focused layouts. Includes section order, CTA placement, color strategy, effects, and conversion optimization tips.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Pattern Name", "type": "string", "description": "Landing page pattern name"},
+        {"column": "Keywords", "type": "string", "description": "Search keywords"},
+        {"column": "Section Order", "type": "string", "description": "Recommended section sequence"},
+        {"column": "Primary CTA Placement", "type": "string", "description": "Where to place the main CTA"},
+        {"column": "Color Strategy", "type": "string", "description": "Color scheme recommendations"},
+        {"column": "Recommended Effects", "type": "string", "description": "Animation and effect suggestions"},
+        {"column": "Conversion Optimization", "type": "string", "description": "Conversion-focused tips"}
+      ]
+    },
+    {
+      "path": "data/products.csv",
+      "domain": "product",
+      "recordCount": 95,
+      "description": "Complete product type mapping for 95 industries/categories. Maps each product type to primary/secondary styles, landing page patterns, dashboard styles, color palettes, and key considerations.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Product Type", "type": "string", "description": "Industry or product category"},
+        {"column": "Keywords", "type": "string", "description": "Search keywords"},
+        {"column": "Primary Style Recommendation", "type": "string", "description": "Primary design style"},
+        {"column": "Secondary Styles", "type": "string", "description": "Alternative styles"},
+        {"column": "Landing Page Pattern", "type": "string", "description": "Recommended landing page pattern"},
+        {"column": "Dashboard Style (if applicable)", "type": "string", "description": "Dashboard pattern for data apps"},
+        {"column": "Color Palette Focus", "type": "string", "description": "Color palette direction"},
+        {"column": "Key Considerations", "type": "string", "description": "Important design considerations"}
+      ]
+    },
+    {
+      "path": "data/stacks/astro.csv",
+      "domain": "stack:astro",
+      "stack": "astro",
+      "recordCount": 53,
+      "description": "Astro framework best practices. Covers Routing, Rendering, Data Fetching, Images, Performance, SEO, and Deployment guidelines.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Category", "type": "string", "description": "Guideline category"},
+        {"column": "Guideline", "type": "string", "description": "Guideline name"},
+        {"column": "Description", "type": "string", "description": "Guideline description"},
+        {"column": "Do", "type": "string", "description": "Best practice"},
+        {"column": "Don't", "type": "string", "description": "What to avoid"},
+        {"column": "Code Good", "type": "string", "description": "Good code example"},
+        {"column": "Code Bad", "type": "string", "description": "Bad code example"},
+        {"column": "Severity", "type": "string", "description": "Severity level"},
+        {"column": "Docs URL", "type": "string", "description": "Documentation link"}
+      ]
+    },
+    {
+      "path": "data/stacks/flutter.csv",
+      "domain": "stack:flutter",
+      "stack": "flutter",
+      "recordCount": 52,
+      "description": "Flutter framework best practices. Covers Widget Architecture, State Management, Navigation, Performance, Layout, Theming, and Testing guidelines.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Category", "type": "string", "description": "Guideline category"},
+        {"column": "Guideline", "type": "string", "description": "Guideline name"},
+        {"column": "Description", "type": "string", "description": "Guideline description"},
+        {"column": "Do", "type": "string", "description": "Best practice"},
+        {"column": "Don't", "type": "string", "description": "What to avoid"},
+        {"column": "Code Good", "type": "string", "description": "Good code example"},
+        {"column": "Code Bad", "type": "string", "description": "Bad code example"},
+        {"column": "Severity", "type": "string", "description": "Severity level"},
+        {"column": "Docs URL", "type": "string", "description": "Documentation link"}
+      ]
+    },
+    {
+      "path": "data/stacks/html-tailwind.csv",
+      "domain": "stack:html-tailwind",
+      "stack": "html-tailwind",
+      "recordCount": 55,
+      "description": "HTML + Tailwind CSS best practices. Covers Layout, Typography, Responsive Design, Components, Performance, Accessibility, and Dark Mode guidelines.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Category", "type": "string", "description": "Guideline category"},
+        {"column": "Guideline", "type": "string", "description": "Guideline name"},
+        {"column": "Description", "type": "string", "description": "Guideline description"},
+        {"column": "Do", "type": "string", "description": "Best practice"},
+        {"column": "Don't", "type": "string", "description": "What to avoid"},
+        {"column": "Code Good", "type": "string", "description": "Good code example"},
+        {"column": "Code Bad", "type": "string", "description": "Bad code example"},
+        {"column": "Severity", "type": "string", "description": "Severity level"},
+        {"column": "Docs URL", "type": "string", "description": "Documentation link"}
+      ]
+    },
+    {
+      "path": "data/stacks/jetpack-compose.csv",
+      "domain": "stack:jetpack-compose",
+      "stack": "jetpack-compose",
+      "recordCount": 52,
+      "description": "Jetpack Compose (Android) best practices. Covers Composable Design, State Management, Navigation, Performance, Theming, and Material Design 3 guidelines.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Category", "type": "string", "description": "Guideline category"},
+        {"column": "Guideline", "type": "string", "description": "Guideline name"},
+        {"column": "Description", "type": "string", "description": "Guideline description"},
+        {"column": "Do", "type": "string", "description": "Best practice"},
+        {"column": "Don't", "type": "string", "description": "What to avoid"},
+        {"column": "Code Good", "type": "string", "description": "Good code example"},
+        {"column": "Code Bad", "type": "string", "description": "Bad code example"},
+        {"column": "Severity", "type": "string", "description": "Severity level"},
+        {"column": "Docs URL", "type": "string", "description": "Documentation link"}
+      ]
+    },
+    {
+      "path": "data/stacks/nextjs.csv",
+      "domain": "stack:nextjs",
+      "stack": "nextjs",
+      "recordCount": 52,
+      "description": "Next.js best practices. Covers Routing, Rendering, Data Fetching, Images, Fonts, Metadata, API, Middleware, Environment, Performance, Links, Config, Deployment, and Security guidelines.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Category", "type": "string", "description": "Guideline category"},
+        {"column": "Guideline", "type": "string", "description": "Guideline name"},
+        {"column": "Description", "type": "string", "description": "Guideline description"},
+        {"column": "Do", "type": "string", "description": "Best practice"},
+        {"column": "Don't", "type": "string", "description": "What to avoid"},
+        {"column": "Code Good", "type": "string", "description": "Good code example"},
+        {"column": "Code Bad", "type": "string", "description": "Bad code example"},
+        {"column": "Severity", "type": "string", "description": "Severity level"},
+        {"column": "Docs URL", "type": "string", "description": "Documentation link"}
+      ]
+    },
+    {
+      "path": "data/stacks/nuxt-ui.csv",
+      "domain": "stack:nuxt-ui",
+      "stack": "nuxt-ui",
+      "recordCount": 50,
+      "description": "Nuxt UI best practices. Covers Components, Layout, Theming, Forms, Data Display, and App Config guidelines.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Category", "type": "string", "description": "Guideline category"},
+        {"column": "Guideline", "type": "string", "description": "Guideline name"},
+        {"column": "Description", "type": "string", "description": "Guideline description"},
+        {"column": "Do", "type": "string", "description": "Best practice"},
+        {"column": "Don't", "type": "string", "description": "What to avoid"},
+        {"column": "Code Good", "type": "string", "description": "Good code example"},
+        {"column": "Code Bad", "type": "string", "description": "Bad code example"},
+        {"column": "Severity", "type": "string", "description": "Severity level"},
+        {"column": "Docs URL", "type": "string", "description": "Documentation link"}
+      ]
+    },
+    {
+      "path": "data/stacks/nuxtjs.csv",
+      "domain": "stack:nuxtjs",
+      "stack": "nuxtjs",
+      "recordCount": 58,
+      "description": "Nuxt.js best practices. Covers Routing, Rendering, Data Fetching, State Management, Images, SEO, Middleware, Performance, and Deployment guidelines.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Category", "type": "string", "description": "Guideline category"},
+        {"column": "Guideline", "type": "string", "description": "Guideline name"},
+        {"column": "Description", "type": "string", "description": "Guideline description"},
+        {"column": "Do", "type": "string", "description": "Best practice"},
+        {"column": "Don't", "type": "string", "description": "What to avoid"},
+        {"column": "Code Good", "type": "string", "description": "Good code example"},
+        {"column": "Code Bad", "type": "string", "description": "Bad code example"},
+        {"column": "Severity", "type": "string", "description": "Severity level"},
+        {"column": "Docs URL", "type": "string", "description": "Documentation link"}
+      ]
+    },
+    {
+      "path": "data/stacks/react-native.csv",
+      "domain": "stack:react-native",
+      "stack": "react-native",
+      "recordCount": 51,
+      "description": "React Native best practices. Covers Components, Navigation, State Management, Performance, Styling, Platform-specific, and Testing guidelines.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Category", "type": "string", "description": "Guideline category"},
+        {"column": "Guideline", "type": "string", "description": "Guideline name"},
+        {"column": "Description", "type": "string", "description": "Guideline description"},
+        {"column": "Do", "type": "string", "description": "Best practice"},
+        {"column": "Don't", "type": "string", "description": "What to avoid"},
+        {"column": "Code Good", "type": "string", "description": "Good code example"},
+        {"column": "Code Bad", "type": "string", "description": "Bad code example"},
+        {"column": "Severity", "type": "string", "description": "Severity level"},
+        {"column": "Docs URL", "type": "string", "description": "Documentation link"}
+      ]
+    },
+    {
+      "path": "data/stacks/react.csv",
+      "domain": "stack:react",
+      "stack": "react",
+      "recordCount": 53,
+      "description": "React best practices. Covers Components, Hooks, State Management, Performance, Styling, Patterns, and Testing guidelines.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Category", "type": "string", "description": "Guideline category"},
+        {"column": "Guideline", "type": "string", "description": "Guideline name"},
+        {"column": "Description", "type": "string", "description": "Guideline description"},
+        {"column": "Do", "type": "string", "description": "Best practice"},
+        {"column": "Don't", "type": "string", "description": "What to avoid"},
+        {"column": "Code Good", "type": "string", "description": "Good code example"},
+        {"column": "Code Bad", "type": "string", "description": "Bad code example"},
+        {"column": "Severity", "type": "string", "description": "Severity level"},
+        {"column": "Docs URL", "type": "string", "description": "Documentation link"}
+      ]
+    },
+    {
+      "path": "data/stacks/shadcn.csv",
+      "domain": "stack:shadcn",
+      "stack": "shadcn",
+      "recordCount": 60,
+      "description": "shadcn/ui best practices. Covers Installation, Theming, Components, Forms, Data Display, Overlay, Navigation, and Customization guidelines.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Category", "type": "string", "description": "Guideline category"},
+        {"column": "Guideline", "type": "string", "description": "Guideline name"},
+        {"column": "Description", "type": "string", "description": "Guideline description"},
+        {"column": "Do", "type": "string", "description": "Best practice"},
+        {"column": "Don't", "type": "string", "description": "What to avoid"},
+        {"column": "Code Good", "type": "string", "description": "Good code example"},
+        {"column": "Code Bad", "type": "string", "description": "Bad code example"},
+        {"column": "Severity", "type": "string", "description": "Severity level"},
+        {"column": "Docs URL", "type": "string", "description": "Documentation link"}
+      ]
+    },
+    {
+      "path": "data/stacks/svelte.csv",
+      "domain": "stack:svelte",
+      "stack": "svelte",
+      "recordCount": 53,
+      "description": "Svelte best practices. Covers Reactivity, Components, Stores, Routing, Performance, Styling, and SvelteKit guidelines.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Category", "type": "string", "description": "Guideline category"},
+        {"column": "Guideline", "type": "string", "description": "Guideline name"},
+        {"column": "Description", "type": "string", "description": "Guideline description"},
+        {"column": "Do", "type": "string", "description": "Best practice"},
+        {"column": "Don't", "type": "string", "description": "What to avoid"},
+        {"column": "Code Good", "type": "string", "description": "Good code example"},
+        {"column": "Code Bad", "type": "string", "description": "Bad code example"},
+        {"column": "Severity", "type": "string", "description": "Severity level"},
+        {"column": "Docs URL", "type": "string", "description": "Documentation link"}
+      ]
+    },
+    {
+      "path": "data/stacks/swiftui.csv",
+      "domain": "stack:swiftui",
+      "stack": "swiftui",
+      "recordCount": 50,
+      "description": "SwiftUI best practices. Covers Views, State Management, Navigation, Layout, Performance, Theming, and Accessibility guidelines.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Category", "type": "string", "description": "Guideline category"},
+        {"column": "Guideline", "type": "string", "description": "Guideline name"},
+        {"column": "Description", "type": "string", "description": "Guideline description"},
+        {"column": "Do", "type": "string", "description": "Best practice"},
+        {"column": "Don't", "type": "string", "description": "What to avoid"},
+        {"column": "Code Good", "type": "string", "description": "Good code example"},
+        {"column": "Code Bad", "type": "string", "description": "Bad code example"},
+        {"column": "Severity", "type": "string", "description": "Severity level"},
+        {"column": "Docs URL", "type": "string", "description": "Documentation link"}
+      ]
+    },
+    {
+      "path": "data/stacks/vue.csv",
+      "domain": "stack:vue",
+      "stack": "vue",
+      "recordCount": 49,
+      "description": "Vue.js best practices. Covers Composition API, Reactivity, Components, Routing, State Management, Performance, and Styling guidelines.",
+      "schema": [
+        {"column": "No", "type": "integer", "description": "Row index"},
+        {"column": "Category", "type": "string", "description": "Guideline category"},
+        {"column": "Guideline", "type": "string", "description": "Guideline name"},
+        {"column": "Description", "type": "string", "description": "Guideline description"},
+        {"column": "Do", "type": "string", "description": "Best practice"},
+        {"column": "Don't", "type": "string", "description": "What to avoid"},
+        {"column": "Code Good", "type": "string", "description": "Good code example"},
+        {"column": "Code Bad", "type": "string", "description": "Bad code example"},
+        {"column": "Severity", "type": "string", "description": "Severity level"},
+        {"column": "Docs URL", "type": "string", "description": "Documentation link"}
+      ]
+    }
+  ],
+  "domainMap": {
+    "color": "data/colors.csv",
+    "style": "data/styles.csv",
+    "typography": "data/typography.csv",
+    "ux": "data/ux-guidelines.csv",
+    "chart": "data/charts.csv",
+    "icon": "data/icons.csv",
+    "reasoning": "data/ui-reasoning.csv",
+    "web": "data/web-interface.csv",
+    "performance": "data/react-performance.csv",
+    "landing": "data/landing.csv",
+    "product": "data/products.csv",
+    "stack:astro": "data/stacks/astro.csv",
+    "stack:flutter": "data/stacks/flutter.csv",
+    "stack:html-tailwind": "data/stacks/html-tailwind.csv",
+    "stack:jetpack-compose": "data/stacks/jetpack-compose.csv",
+    "stack:nextjs": "data/stacks/nextjs.csv",
+    "stack:nuxt-ui": "data/stacks/nuxt-ui.csv",
+    "stack:nuxtjs": "data/stacks/nuxtjs.csv",
+    "stack:react-native": "data/stacks/react-native.csv",
+    "stack:react": "data/stacks/react.csv",
+    "stack:shadcn": "data/stacks/shadcn.csv",
+    "stack:svelte": "data/stacks/svelte.csv",
+    "stack:swiftui": "data/stacks/swiftui.csv",
+    "stack:vue": "data/stacks/vue.csv"
+  }
+}

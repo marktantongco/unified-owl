@@ -1,0 +1,213 @@
+{
+  "version": "5.4",
+  "routing_mode": "per_provider",
+  "entry_point": "ccproxy-api:8000",
+  "china_routing": "via_orcaflow:20130",
+  "default": "direct",
+
+  "providers": {
+    "kiro": {
+      "proxy": "direct",
+      "type": "none",
+      "reason": "Free, no geo-restrictions, OAuth not needed"
+    },
+    "iflow": {
+      "proxy": "direct",
+      "type": "none",
+      "reason": "Free, no geo-restrictions"
+    },
+    "opencodesh": {
+      "proxy": "direct",
+      "type": "none",
+      "reason": "Free, no auth needed"
+    },
+    "claude_code": {
+      "proxy": "direct",
+      "type": "none",
+      "reason": "OAuth - proxy breaks token refresh"
+    },
+    "openai_codex": {
+      "proxy": "direct",
+      "type": "none",
+      "reason": "OAuth - proxy breaks token refresh"
+    },
+    "github_copilot": {
+      "proxy": "direct",
+      "type": "none",
+      "reason": "OAuth - proxy breaks subscription validation"
+    },
+    "gemini_cli": {
+      "proxy": "direct",
+      "type": "none",
+      "reason": "Google OAuth - strict redirect URI checks"
+    },
+    "cursor": {
+      "proxy": "direct",
+      "type": "none",
+      "reason": "Subscription validation - proxy triggers fraud"
+    },
+    "vertex": {
+      "proxy": "direct",
+      "type": "none",
+      "reason": "Google Cloud IAM - complex auth chain"
+    },
+    "azure": {
+      "proxy": "direct",
+      "type": "none",
+      "reason": "Entra ID SSO - incompatible with proxy"
+    },
+    "openrouter": {
+      "proxy": "direct",
+      "type": "none",
+      "reason": "Works fine direct, proxy optional for blocks",
+      "optional_proxy": "http://127.0.0.1:60000"
+    },
+    "groq": {
+      "proxy": "direct",
+      "type": "none",
+      "reason": "Fast inference, no proxy needed",
+      "optional_proxy": "http://127.0.0.1:60000"
+    },
+    "anthropic_api": {
+      "proxy": "direct",
+      "type": "none",
+      "reason": "Direct API works fine",
+      "optional_proxy": "http://127.0.0.1:60000"
+    },
+    "openai_api": {
+      "proxy": "direct",
+      "type": "none",
+      "reason": "Direct API works fine",
+      "optional_proxy": "http://127.0.0.1:60000"
+    },
+    "glm": {
+      "proxy": "http://127.0.0.1:60000",
+      "type": "http",
+      "reason": "China-optimized routing",
+      "health_check": "https://open.bigmodel.cn/api/paas/v4/models",
+      "country": "CN",
+      "failover": [
+        "http://127.0.0.1:60001",
+        "http://127.0.0.1:60002"
+      ]
+    },
+    "glm-cn": {
+      "proxy": "http://127.0.0.1:60000",
+      "type": "http",
+      "reason": "China-optimized routing",
+      "health_check": "https://open.bigmodel.cn/api/paas/v4/models",
+      "country": "CN",
+      "failover": [
+        "http://127.0.0.1:60001",
+        "http://127.0.0.1:60002"
+      ]
+    },
+    "minimax": {
+      "proxy": "http://127.0.0.1:60000",
+      "type": "http",
+      "reason": "China-optimized routing",
+      "health_check": "https://api.minimax.chat/v1/models",
+      "country": "CN",
+      "failover": [
+        "http://127.0.0.1:60001"
+      ]
+    },
+    "minimax-cn": {
+      "proxy": "http://127.0.0.1:60000",
+      "type": "http",
+      "reason": "China-optimized routing",
+      "health_check": "https://api.minimax.chat/v1/models",
+      "country": "CN",
+      "failover": [
+        "http://127.0.0.1:60001"
+      ]
+    },
+    "deepseek": {
+      "proxy": "http://127.0.0.1:60000",
+      "type": "http",
+      "reason": "China-optimized routing",
+      "health_check": "https://api.deepseek.com/v1/models",
+      "country": "CN",
+      "failover": [
+        "http://127.0.0.1:60001"
+      ]
+    },
+    "kimi": {
+      "proxy": "http://127.0.0.1:60000",
+      "type": "http",
+      "reason": "China-based API",
+      "health_check": "https://api.moonshot.cn/v1/models",
+      "country": "CN",
+      "failover": [
+        "http://127.0.0.1:60001"
+      ]
+    },
+    "kmc": {
+      "proxy": "http://127.0.0.1:60000",
+      "type": "http",
+      "reason": "China-based API (Kimi)",
+      "health_check": "https://api.moonshot.cn/v1/models",
+      "country": "CN",
+      "failover": [
+        "http://127.0.0.1:60001"
+      ]
+    },
+    "siliconflow": {
+      "proxy": "http://127.0.0.1:60000",
+      "type": "http",
+      "reason": "China model hub",
+      "health_check": "https://api.siliconflow.cn/v1/models",
+      "country": "CN",
+      "failover": [
+        "http://127.0.0.1:60001"
+      ]
+    },
+    "qw": {
+      "proxy": "http://127.0.0.1:60000",
+      "type": "http",
+      "reason": "China-based API (Qwen/Alibaba)",
+      "health_check": "https://dashscope.aliyuncs.com/compatible-mode/v1/models",
+      "country": "CN",
+      "failover": [
+        "http://127.0.0.1:60001"
+      ]
+    },
+    "alicode": {
+      "proxy": "http://127.0.0.1:60000",
+      "type": "http",
+      "reason": "China-based API (Alibaba AI Code)",
+      "health_check": "https://dashscope.aliyuncs.com/compatible-mode/v1/models",
+      "country": "CN",
+      "failover": [
+        "http://127.0.0.1:60001"
+      ]
+    },
+    "alicode-intl": {
+      "proxy": "direct",
+      "type": "none",
+      "reason": "International Alibaba endpoint - no proxy needed"
+    }
+  },
+
+  "proxy_pool": {
+    "enabled": true,
+    "directory": "/home/x1/.orcaflow/config/proxy-pool",
+    "health_check_interval": 300,
+    "rotation_interval": 1800,
+    "max_failures": 3
+  },
+
+  "failover": {
+    "enabled": true,
+    "primary": "OrcaFlow",
+    "secondary": "ccproxy-api",
+    "tertiary": "FreeProxy",
+    "health_check_interval": 60,
+    "max_retries": 3
+  },
+
+  "logging": {
+    "level": "info",
+    "file": "/home/x1/.orcaflow/logs/proxy-routing.log"
+  }
+}

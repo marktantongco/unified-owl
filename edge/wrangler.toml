@@ -1,0 +1,22 @@
+name = "owl-fbaas-edge"
+main = "edge/worker.js"
+compatibility_date = "2026-08-29"
+compatibility_flags = ["nodejs_compat"]
+
+# FBaaS Edge — deploys SmartChannelRouter as Cloudflare Worker
+# See Wild Idea #3: deploy to real regional IPs (no proxy detection)
+
+[vars]
+OWL_PROXY_HOST = "0.0.0.0"
+OWL_PROXY_PORT = "8787"
+OWL_ENABLE_MESH = "false"
+
+[observability]
+enabled = true
+
+[[r2_buckets]]
+binding = "CACHE"
+bucket_name = "owl-cache"
+
+[triggers]
+crons = ["* * * * *"]

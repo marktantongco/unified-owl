@@ -1,0 +1,37 @@
+{
+  "version": "3.0",
+  "strategy": "cost-optimized",
+  "tiers": {
+    "free": {
+      "providers": ["Antigravity"],
+      "priority": 1,
+      "quota_threshold": 0.80,
+      "models": ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.5-flash-lite"]
+    },
+    "china_direct": {
+      "providers": ["GLM", "Kimi", "Qwen", "DeepSeek", "MiniMax", "SiliconFlow"],
+      "priority": 2,
+      "proxy": "127.0.0.1:60000",
+      "models": ["glm-4-plus", "kimi-k2", "qwen-max", "deepseek-v3", "minimax-m1"]
+    },
+    "oauth_direct": {
+      "providers": ["OpenCode", "Kiro", "iFlow", "OpenRouter", "Groq", "Anthropic", "OpenAI"],
+      "priority": 3,
+      "proxy": "direct",
+      "models": ["*"]
+    }
+  },
+  "failover": {
+    "enabled": true,
+    "max_retries": 3,
+    "retry_delay_ms": 1000,
+    "cascade": ["free", "china_direct", "oauth_direct"],
+    "health_check_interval": 60
+  },
+  "caching": {
+    "enabled": true,
+    "ttl_seconds": 300,
+    "max_entries": 1000,
+    "exclude_patterns": ["*stream*", "*agent*", "*thinking*"]
+  }
+}
