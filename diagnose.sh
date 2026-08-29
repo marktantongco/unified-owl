@@ -494,6 +494,28 @@ except Exception:
 "
     fi
   fi
+
+  # ── Geo-fence: assert egress is US (freebuff US relay contract) ──
+  if command -v curl &>/dev/null && command -v python3 &>/dev/null; then
+    echo -e "\n  ${DIM}── Geo-fence (US relay) ──${NC}"
+    local country
+    country=$(curl -s --max-time 5 https://ipinfo.io/country 2>/dev/null | tr -d '[:space:]' || echo "unknown")
+    if [[ "${country}" == "US" ]]; then
+      pass "Egress country: US ✅"
+    elif [[ "${country}" == "unknown" ]]; then
+      warn "Egress country: unknown (ipinfo blocked)"
+    else
+      fail "Egress country: ${country} — expected US (freebuff US relay contract)"
+      suggest_fix "check us_relay chain or OWL_EXTRA_PROXIES tier=residential" \
+        "OWL_EXTRA_PROXIES=socks5://us-residential:pass@us-proxy:1080 bash install.sh --verify-agents && curl -s https://ipinfo.io/country"
+    fi
+    # also check owl_security + us_relay health if available
+    if command -v python3 &>/dev/null && [[ -f "/home/x2/airspace/us_relay/chain.py" ]]; then
+      local chain_score
+      chain_score=$(python3 -c "from us_relay.chain import chain; print(chain.stats()['tiers']['residential']['score'])" 2>/dev/null || echo "0.5")
+      info "us_relay residential score: ${chain_score}"
+    fi
+  fi
 }
 
 # ═══════════════════════════════════════════════════════════════════════════

@@ -27,6 +27,26 @@ try:
 except ImportError:
     chameleon_engine = None
     CHAMELEON_AVAILABLE = False
+# Materialized 3: us-relay chain + auth vault + freebuff2api translator
+try:
+    from us_relay.chain import chain as proxy_chain, mux as egress_mux
+    US_RELAY_AVAILABLE = True
+except ImportError:
+    proxy_chain = None
+    egress_mux = None
+    US_RELAY_AVAILABLE = False
+try:
+    from auth.oauth import manager as auth_manager
+    AUTH_AVAILABLE = True
+except ImportError:
+    auth_manager = None
+    AUTH_AVAILABLE = False
+try:
+    from freebuff2api.translator import api as translator_api
+    TRANSLATOR_AVAILABLE = True
+except ImportError:
+    translator_api = None
+    TRANSLATOR_AVAILABLE = False
 
 
 # ─── Environment helpers (module-level so they are testable) ─────
@@ -110,6 +130,11 @@ class OwlServer:
         app.router.add_get("/health", self.handle_health)
         app.router.add_get("/stats", self.handle_stats)
         app.router.add_get("/chameleon/stats", self.handle_chameleon_stats)
+        # freebuff2api clean surface — always on main port + also on Orca/Kiro sub-ports
+        app.router.add_get("/v1/models", self.handle_orca_models)
+        app.router.add_post("/v1/chat/completions", self.handle_orca_chat)
+        app.router.add_get("/auth/stats", self.handle_auth_stats)
+        app.router.add_get("/us-relay/stats", self.handle_us_relay_stats)
         app.on_shutdown.append(self._on_shutdown)
 
         self._api_runner = web.AppRunner(app)
@@ -148,16 +173,38 @@ class OwlServer:
 
     async def handle_orca_models(self, request: web.Request) -> web.Response:
         """GET /v1/models — Orca Router compatibility (freebuff2api translator)."""
+        if TRANSLATOR_AVAILABLE and translator_api:
+            return web.json_response(translator_api.models())
         return web.json_response({"object": "list", "data": [{"id": "owl-auto-racer", "object": "model", "owned_by": "owl"}, {"id": "gpt-4o", "object": "model"}, {"id": "claude-3.5-sonnet", "object": "model"}]})
 
     async def handle_orca_chat(self, request: web.Request) -> web.Response:
-        """POST /v1/chat/completions — minimal OpenAI-compatible proxy (stream racing placeholder)."""
+        """POST /v1/chat/completions — freebuff2api translator + stream racing."""
         try:
             body = await request.json()
         except Exception:
             body = {}
-        # Echo stub — real implementation races Copilot/Antigravity via SmartChannelRouter
-        return web.json_response({"id": "chatcmpl-owl", "object": "chat.completion", "choices": [{"message": {"role": "assistant", "content": f"[OWL stub] {body.get('messages', [])[-1].get('content','') if body.get('messages') else 'ok'}"}, "finish_reason": "stop"}]})
+        # Auth injection — transparent token via vault if provider needs it
+        if AUTH_AVAILABLE and auth_manager:
+            # Never proxy OAuth endpoints, but inject token for chat
+            prov = body.get("model", "openai_api")
+            token = auth_manager.get_token(prov)
+            if token:
+                # inject for downstream (not returned to client)
+                body["_owl_token"] = token[:8] + "..."
+        # us-relay tier selection (exposed via header for observability)
+        tier = None
+        if US_RELAY_AVAILABLE and proxy_chain:
+            _, tier = proxy_chain.pick()
+        if TRANSLATOR_AVAILABLE and translator_api:
+            try:
+                res = await translator_api.chat(body)
+                if tier:
+                    res["owl_tier"] = tier
+                return web.json_response(res)
+            except Exception as e:
+                logger.error(f"translator race failed: {e}")
+        # Fallback stub
+        return web.json_response({"id": "chatcmpl-owl", "object": "chat.completion", "choices": [{"message": {"role": "assistant", "content": f"[OWL stub tier={tier}] {body.get('messages', [])[-1].get('content','') if body.get('messages') else 'ok'}"}, "finish_reason": "stop"}]})
 
     async def stop(self):
         """Graceful shutdown."""
@@ -291,6 +338,16 @@ class OwlServer:
         if not CHAMELEON_AVAILABLE or chameleon_engine is None:
             return web.json_response({"enabled": False, "reason": "chameleon_ai not installed"})
         return web.json_response({"enabled": True, **chameleon_engine.stats()})
+
+    async def handle_auth_stats(self, request: web.Request) -> web.Response:
+        if not AUTH_AVAILABLE or auth_manager is None:
+            return web.json_response({"enabled": False})
+        return web.json_response({"enabled": True, **auth_manager.stats()})
+
+    async def handle_us_relay_stats(self, request: web.Request) -> web.Response:
+        if not US_RELAY_AVAILABLE or proxy_chain is None:
+            return web.json_response({"enabled": False})
+        return web.json_response({"enabled": True, **proxy_chain.stats(), "egress": await egress_mux.health() if egress_mux else {}})
 
     async def handle_metrics(self, request: web.Request) -> web.Response:
         """GET /metrics — Prometheus metrics."""

@@ -480,14 +480,15 @@ class ProxyPoolManager:
         self._running = True
         self._load_cache()
 
-        # Seed configured extra proxies (local prox5 / https_proxy endpoints)
+        # Seed configured extra proxies (local prox5 / https_proxy endpoints) — tag tier=residential for US-relay chain
         for url in self.extra_proxies:
             if url not in self._url_set:
-                entry = ProxyEntry(url=url)
+                tier = "residential" if "us-" in url.lower() or "residential" in url.lower() else "datacenter" if "socks" in url.lower() else "residential"
+                entry = ProxyEntry(url=url, metadata={"tier": tier, "source": "extra"})
                 self._proxies.append(entry)
                 self._url_set.add(url)
                 self._url_map[url] = entry
-                logger.info(f"Extra proxy seeded into pool: {url}")
+                logger.info(f"Extra proxy seeded into pool: {url} tier={tier}")
 
         # If no cached/extra proxies, try to fetch from public proxy lists
         if not self._proxies:
@@ -614,7 +615,8 @@ class ProxyPoolManager:
                             else:
                                 proxy_url = f"http://{line}"
                             if proxy_url not in self._url_set:
-                                new_entry = ProxyEntry(url=proxy_url)
+                                tier = "residential" if "socks5" in url.lower() else "datacenter"
+                                new_entry = ProxyEntry(url=proxy_url, metadata={"tier": tier, "source": url.split('/')[-1]})
                                 self._proxies.append(new_entry)
                                 self._url_set.add(proxy_url)
                                 self._url_map[proxy_url] = new_entry
