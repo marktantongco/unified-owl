@@ -38,6 +38,13 @@ import aiohttp
 import aiofiles
 import httpx
 from circuitbreaker import CircuitBreaker
+# P0-3 SSRF — extracted allowlist, used before any outbound connection
+try:
+    from owl_security.ssrf import is_allowed
+    SSRF_AVAILABLE = True
+except ImportError:
+    def is_allowed(url, extra_domains=None): return True
+    SSRF_AVAILABLE = False
 
 # ─── Python 3.14+ compatibility: monkey-patch asyncio.get_event_loop ───
 # ProxyBroker2 calls asyncio.get_event_loop() at module import time.
@@ -1161,6 +1168,11 @@ class ResilientClient:
     async def request(self, method: str, url: str, params: Optional[Dict] = None,
                       headers: Optional[Dict] = None, browser: bool = False,
                       wait_for: Optional[str] = None, timeout: int = 30, **kwargs) -> CachedResponse:
+        # P0-3: SSRF gate — check allowlist before any outbound (P0-10 3-port bind depends on this)
+        extra = os.getenv("OWL_ALLOW_EXTRA", "").split(",") if os.getenv("OWL_ALLOW_EXTRA") else None
+        if extra == [""]: extra = None
+        if not is_allowed(url, extra_domains=extra):
+            raise RuntimeError(f"SSRF blocked: {url} not in allowlist")
         if browser:
             content = await self._fetch_with_browser(url, wait_for, timeout)
             return CachedResponse(

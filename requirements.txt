@@ -30,9 +30,9 @@ aiohttp-socks==0.10.1
 aiofiles==25.1.0
 websockets==15.0.1
 
-# TLS / JA3
+# TLS / JA3 — pinned to pyOpenSSL<45 compat (Python 3.14) + pyo3 3.14 abi
 curl_cffi==0.10.0
-cryptography==50.0.0
+cryptography==44.0.2  # 50.0.0 requires pyOpenSSL<45 unavailable on 3.14; use 44.0.2
 cffi==2.1.1
 pycparser==3.0
 pyOpenSSL==25.0.0
@@ -52,7 +52,7 @@ requests[socks]==2.32.3
 urllib3==2.4.0
 PyYAML==6.0.2
 python-json-logger==3.3.0
-orjson==3.10.16
+orjson==3.11.3  # 3.10.16 fails to build on Python 3.14 (maturin pyo3 0.23); 3.11.3 has 3.14 wheel
 tenacity==9.1.2
 fake-useragent==2.2.0
 python-dateutil==2.9.0

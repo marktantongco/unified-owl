@@ -18,6 +18,17 @@ from typing import Dict, Any, Optional, List
 import logging
 logger = logging.getLogger("chameleon_ai")
 
+# Prometheus — lazy so tests without prometheus_client still pass
+try:
+    from prometheus_client import Gauge
+    chameleon_score = Gauge("chameleon_score", "Chameleon per-domain adaptive score", ["domain", "ja3", "tier"])
+    chameleon_sr = Gauge("chameleon_success_rate", "Chameleon per-domain success rate", ["domain"])
+    PROM_AVAILABLE = True
+except ImportError:
+    chameleon_score = None
+    chameleon_sr = None
+    PROM_AVAILABLE = False
+
 # ─── Config Space ─────────────────────────────────────────────────────────
 @dataclass
 class FingerprintProfile:
@@ -93,8 +104,21 @@ class ChameleonEngine:
                 new_p.score = p.score
                 self.per_domain[domain] = new_p
                 logger.warning(f"Chameleon mutate {domain}: {p.ja3}/{p.proxy_tier} → {new_p.ja3}/{new_p.proxy_tier} (score {p.score:.2f})")
+                # expose mutated profile to Prometheus as well
+                if PROM_AVAILABLE:
+                    try:
+                        chameleon_score.labels(domain=domain, ja3=new_p.ja3, tier=new_p.proxy_tier).set(new_p.score)
+                        chameleon_sr.labels(domain=domain).set(new_p.success_rate)
+                    except Exception:
+                        pass
                 return
         self.history.append({"domain": domain, "success": success, "blocked": blocked, "score": p.score, "ts": time.time()})
+        if PROM_AVAILABLE:
+            try:
+                chameleon_score.labels(domain=domain, ja3=p.ja3, tier=p.proxy_tier).set(p.score)
+                chameleon_sr.labels(domain=domain).set(p.success_rate)
+            except Exception:
+                pass
 
     def best_profile(self) -> FingerprintProfile:
         if not self.per_domain:
