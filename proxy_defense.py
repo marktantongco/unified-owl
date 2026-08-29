@@ -217,15 +217,14 @@ class TokenBucket:
         return await self.acquire(tokens)
 
 @dataclass(slots=True)
-@dataclass
 class ProxyEntry:
     url: str
     healthy: bool = True
     last_check: float = 0.0
     fail_count: int = 0
     ban_until: float = 0.0
-    metadata: Dict[str, Any] = field(default_factory=dict)  # P0-1: carries tier/source/proxy_type without breaking slots
     latency_ms: float = 9999.0
+    metadata: Dict[str, Any] = field(default_factory=dict)  # P0-1: tier/source/proxy_type — must be last (default)
     def is_banned(self) -> bool:
         return time.time() < self.ban_until
     def mark_failed(self):
