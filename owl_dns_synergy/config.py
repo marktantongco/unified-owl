@@ -47,6 +47,8 @@ class SynergyConfig:
             "prometheus_port": 9090,
             "dns_flood_max_qps": 50,
             "dns_flood_burst": 100,
+            "nadirclaw_base_url": "http://localhost:8856/v1",
+            "nadirclaw_model": "nadirclaw/auto",
         }
         with open(config_file, "w") as f:
             json.dump(defaults, f, indent=2)
@@ -58,6 +60,8 @@ class SynergyConfig:
             "OPENAI_API_KEY": "openai_api_key",
             "OPENAI_BASE_URL": "openai_base_url",
             "OPENAI_MODEL": "openai_model",
+            "NADIRCLAW_BASE_URL": "nadirclaw_base_url",
+            "NADIRCLAW_MODEL": "nadirclaw_model",
             "LLM_PROXY_KEY": "llm_proxy_key",
             "LLM_DNS_SUFFIX": "dns_suffix",
             "PERPLEXITY_API_KEY": "perplexity_api_key",
@@ -141,6 +145,14 @@ class SynergyConfig:
     @property
     def dns_flood_burst(self) -> int:
         return self._config.get("dns_flood_burst", 100)
+
+    @property
+    def nadirclaw_base_url(self) -> str:
+        return self._config.get("nadirclaw_base_url", "http://localhost:8856/v1")
+
+    @property
+    def nadirclaw_model(self) -> str:
+        return self._config.get("nadirclaw_model", "nadirclaw/auto")
 
     def get_dns_suffix_parts(self) -> list:
         return self.dns_suffix.split(".")

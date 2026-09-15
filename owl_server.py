@@ -12,6 +12,7 @@ Wraps ResilientClient in a production async HTTP server.
 
 import asyncio
 import os
+import sys
 import time
 from typing import Optional
 
@@ -120,6 +121,21 @@ class OwlServer:
             stats = self.client.plugin_loader.get_stats()
             logger.info(f"🔌 Plugins loaded: {stats['total']} ({', '.join(stats['plugins'].keys()) if stats['plugins'] else 'none'})")
 
+        # P3-13 exit-code-78 on bind-fail: distinguish EADDRINUSE (transient
+        # port collision, supervisor wrapper will retry) from other errors
+        # (genuine config bug). systemd RestartPreventExitStatus=78 skips
+        # the restart loop on this exact condition.
+        async def _bind(runner, port, label):
+            site = web.TCPSite(runner, self.host, port)
+            try:
+                await site.start()
+            except OSError as e:
+                if e.errno in (98, 48):  # EADDRINUSE on Linux/macOS
+                    logger.error(f"❌ {label} bind {port} failed: {e} (exit 78 — port collision)")
+                    sys.exit(78)
+                raise
+            return site
+
         # API server (port 60000) — Chameleon middleware injected if available
         middlewares = []
         if CHAMELEON_AVAILABLE:
@@ -139,8 +155,7 @@ class OwlServer:
 
         self._api_runner = web.AppRunner(app)
         await self._api_runner.setup()
-        site = web.TCPSite(self._api_runner, self.host, self.api_port)
-        await site.start()
+        site = await _bind(self._api_runner, self.api_port, "API")
         logger.info(f"🦉 OWL-AGENT API listening on http://{self.host}:{self.api_port}")
 
         # P0-10 3-port binds — Orca Router 60001 + Kiro Gateway 8333 (opt-in via OWL_ENABLE_3PORT=1)
@@ -154,8 +169,7 @@ class OwlServer:
                 sub_app.router.add_get("/chameleon/stats", self.handle_chameleon_stats)
                 runner = web.AppRunner(sub_app)
                 await runner.setup()
-                sub_site = web.TCPSite(runner, self.host, port)
-                await sub_site.start()
+                sub_site = await _bind(runner, port, label)
                 setattr(self, attr, runner)
                 logger.info(f"🔀 {label} listening on http://{self.host}:{port}")
 
@@ -164,8 +178,7 @@ class OwlServer:
         metrics_app.router.add_get("/metrics", self.handle_metrics)
         self._metrics_runner = web.AppRunner(metrics_app)
         await self._metrics_runner.setup()
-        metrics_site = web.TCPSite(self._metrics_runner, self.host, self.metrics_port)
-        await metrics_site.start()
+        metrics_site = await _bind(self._metrics_runner, self.metrics_port, "Metrics")
         logger.info(f"📊 Prometheus metrics at http://{self.host}:{self.metrics_port}/metrics")
 
         # Background proxy pool metrics updater

@@ -14,6 +14,7 @@ from typing import Optional, Dict, Any, List
 from urllib.parse import urlparse
 from collections import deque
 
+import httpx
 from prometheus_client import Counter, Gauge, Histogram, start_http_server
 
 logger = logging.getLogger("owl-dns-synergy.router")
@@ -345,12 +346,35 @@ class SmartChannelRouter:
         self._prefs: Dict[str, DomainPreference] = {}
         self._state: Dict[str, ChannelState] = {}
 
+        # HTTP client timeout (default 30s if not configured)
+        self.http_timeout = getattr(self.config, 'http_timeout', 30.0)
+
         # External client references
         self.http_client = http_client
         self.dns_client = dns_client
+        
+        # Connection pooling for HTTP requests
+        # Reuse connections to upstream proxies for speed
+        self._http_client = httpx.AsyncClient(
+            limits=httpx.Limits(
+                max_keepalive_connections=20,
+                max_connections=50,
+                keepalive_expiry=300.0
+            ),
+            timeout=self.http_timeout
+        ) if not http_client else http_client
+
+        # NadirClaw cost-optimized routing client
+        # Routes simple queries to cheap models, complex to premium
+        self._nadirclaw_base_url = getattr(self.config, 'nadirclaw_base_url', 'http://localhost:8856/v1')
+        self._nadirclaw_model = getattr(self.config, 'nadirclaw_model', 'nadirclaw/auto')
+        self._nadirclaw_client = httpx.AsyncClient(
+            base_url=self._nadirclaw_base_url,
+            timeout=5.0
+        ) if self._nadirclaw_base_url else None
 
     async def initialize(self):
-        """Start background services: cache cleaner, Redis, Prometheus."""
+        """Start background services: cache cleaner, Redis, Prometheus, health checks."""
         await self.cache.start_cleaner()
         if self.redis:
             await self.redis.connect()
@@ -360,6 +384,9 @@ class SmartChannelRouter:
             logger.info(f"Prometheus metrics on port {self.config.prometheus_port}")
         except OSError:
             logger.warning(f"Prometheus port {self.config.prometheus_port} already in use")
+        # Start health check loop for upstream proxies
+        self._health_check_task = asyncio.create_task(self._health_check_loop())
+        logger.info("Upstream proxy health checks started")
 
     def _extract_domain(self, url: str) -> str:
         parsed = urlparse(url)
@@ -400,6 +427,38 @@ class SmartChannelRouter:
         else:
             pref.dns_failures += 1
             self.scorer.update(f"dns:{domain}", False)
+
+    async def _health_check_loop(self):
+        """Background task that periodically checks upstream proxy health."""
+        while True:
+            try:
+                await asyncio.sleep(30)  # Check every 30 seconds
+                # Check NadirClaw connectivity
+                if self._nadirclaw_client:
+                    try:
+                        resp = await self._nadirclaw_client.get("/v1/health", timeout=2.0)
+                        if resp.status_code != 200:
+                            logger.warning(f"NadirClaw health check failed: status {resp.status_code}")
+                    except Exception:
+                        logger.warning("NadirClaw health check unreachable")
+                
+                # Check primary HTTP proxy health
+                try:
+                    resp = await self._http_client.get("http://127.0.0.1:60000/health", timeout=2.0)
+                    if resp.status_code != 200:
+                        logger.warning(f"Primary proxy health check failed: status {resp.status_code}")
+                except Exception:
+                    logger.warning("Primary proxy health check unreachable")
+                
+                # Mark failed upstreams
+                if self._prefs:
+                    for domain, pref in list(self._prefs.items())[:5]:
+                        if pref.http_failures > 10:
+                            logger.info(f"Domain {domain} has {pref.http_failures} HTTP failures, considering circuit breaker")
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error(f"Health check loop error: {e}")
 
     async def fetch(self, url: str, **kwargs) -> ChannelResult:
         """Fetch a URL through the optimal channel with automatic fallback."""
@@ -444,11 +503,19 @@ class SmartChannelRouter:
             return await self._hybrid_retry(url, domain, **kwargs)
 
     async def _try_http(self, url: str, domain: str, **kwargs) -> ChannelResult:
-        """Attempt HTTP proxy channel with key rotation support."""
-        import httpx
+        """Attempt HTTP proxy channel with key rotation support, connection pooling, and response caching."""
+        import time
         start_time = time.time()
         ACTIVE_CONNECTIONS.labels(channel="http").inc()
         try:
+            # Check cache first for repeated queries
+            cached = await self.cache.get("GET", url)
+            if cached and cached.is_fresh():
+                latency = (time.time() - start_time) * 1000
+                REQUESTS_TOTAL.labels(channel="http", domain=domain, status="cached").inc()
+                REQUESTS_DURATION.labels(channel="http", domain=domain).observe(time.time() - start_time)
+                return ChannelResult("cache", True, data=cached.content, latency_ms=latency, status_code=cached.status)
+
             # Use rotated API key if available
             api_key = self.key_rotator.get_active_key()
             headers = {}
@@ -474,14 +541,13 @@ class SmartChannelRouter:
 
             # Cache successful response
             from .core import CachedResponse
-            cached = CachedResponse(
+            cached_resp = CachedResponse(
                 status=status,
                 content=data if isinstance(data, bytes) else data.encode(),
-                headers=dict(resp.headers),
                 timestamp=time.time(),
                 ttl=self.config.cache_ttl,
             )
-            await self.cache.set("GET", url, cached)
+            await self.cache.set("GET", url, cached_resp)
 
             return ChannelResult("http", True, data=data, latency_ms=latency, status_code=status)
 
@@ -494,6 +560,7 @@ class SmartChannelRouter:
             return ChannelResult("http", False, error=str(e), latency_ms=latency)
 
         finally:
+            ACTIVE_CONNECTIONS.labels(channel="http").dec()
             ACTIVE_CONNECTIONS.labels(channel="http").dec()
 
     async def _try_dns(self, url: str, domain: str, client_ip: str = "default", **kwargs) -> ChannelResult:
